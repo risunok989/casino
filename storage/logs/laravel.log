@@ -1,0 +1,306 @@
+[2019-11-06 13:55:29] production.DEBUG: select * from information_schema.tables where table_schema = ? and table_name = ? {"params":["crypto","migrations"],"time":6.35} 
+[2019-11-06 13:55:29] production.DEBUG: create table `migrations` (`id` int unsigned not null auto_increment primary key, `migration` varchar(255) not null, `batch` int not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":11.67} 
+[2019-11-06 13:55:29] production.DEBUG: select `migration` from `migrations` order by `batch` asc, `migration` asc {"params":[],"time":1.02} 
+[2019-11-06 13:55:29] production.DEBUG: select max(`batch`) as aggregate from `migrations` {"params":[],"time":0.4} 
+[2019-11-06 13:55:29] production.DEBUG: create table `users` (`id` int unsigned not null auto_increment primary key, `name` varchar(100) not null, `email` varchar(255) not null, `role` varchar(50) not null, `status` tinyint not null, `password` varchar(255) not null, `remember_token` varchar(100) null, `last_login_from` varchar(45) null, `last_login_at` datetime null, `email_verified_at` timestamp null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":12.07} 
+[2019-11-06 13:55:29] production.DEBUG: alter table `users` add index `users_role_index`(`role`) {"params":[],"time":13.65} 
+[2019-11-06 13:55:29] production.DEBUG: alter table `users` add index `users_status_index`(`status`) {"params":[],"time":12.29} 
+[2019-11-06 13:55:29] production.DEBUG: alter table `users` add unique `users_name_unique`(`name`) {"params":[],"time":11.89} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add unique `users_email_unique`(`email`) {"params":[],"time":19.75} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2014_10_12_000000_create_users_table",1],"time":4.06} 
+[2019-11-06 13:55:30] production.DEBUG: create table `password_resets` (`email` varchar(255) not null, `token` varchar(255) not null, `created_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":18.15} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `password_resets` add index `password_resets_email_index`(`email`) {"params":[],"time":15.13} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2014_10_12_100000_create_password_resets_table",1],"time":3.33} 
+[2019-11-06 13:55:30] production.DEBUG: create table `accounts` (`id` int unsigned not null auto_increment primary key, `user_id` int unsigned not null, `code` varchar(50) not null, `balance` decimal(20, 2) not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":11.67} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `accounts` add constraint `accounts_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade {"params":[],"time":38.02} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `accounts` add unique `accounts_code_unique`(`code`) {"params":[],"time":10.83} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2018_11_28_000000_create_accounts_table",1],"time":1.49} 
+[2019-11-06 13:55:30] production.DEBUG: create table `account_transactions` (`id` int unsigned not null auto_increment primary key, `account_id` int unsigned not null, `amount` decimal(20, 2) not null, `balance` decimal(20, 2) not null, `transactionable_type` varchar(255) not null, `transactionable_id` bigint unsigned not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":15.19} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `account_transactions` add index `account_transactions_morph`(`transactionable_type`, `transactionable_id`) {"params":[],"time":14} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `account_transactions` add constraint `account_transactions_account_id_foreign` foreign key (`account_id`) references `accounts` (`id`) on delete cascade on update cascade {"params":[],"time":36.62} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2018_11_28_000001_create_account_transactions_table",1],"time":1.97} 
+[2019-11-06 13:55:30] production.DEBUG: create table `games` (`id` int unsigned not null auto_increment primary key, `account_id` int unsigned not null, `gameable_type` varchar(255) not null, `gameable_id` bigint unsigned not null, `bet` decimal(16, 2) not null, `win` decimal(16, 2) not null, `result` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":11.42} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` add index `game_morph`(`gameable_type`, `gameable_id`) {"params":[],"time":10.58} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` add constraint `games_account_id_foreign` foreign key (`account_id`) references `accounts` (`id`) on delete cascade on update cascade {"params":[],"time":37.25} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2018_11_29_000000_create_games_table",1],"time":1.1} 
+[2019-11-06 13:55:30] production.DEBUG: create table `game_slots` (`id` int unsigned not null auto_increment primary key, `lines_bet` int not null, `lines_win` int not null, `scatters_count` int not null, `reel_positions` varchar(50) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":9.51} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2018_11_29_000001_create_game_slots_table",1],"time":1.99} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` drop `result` {"params":[],"time":5.34} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_01_14_114519_alter_games_table_delete_result",1],"time":1.88} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` add `status` tinyint not null after `win` {"params":[],"time":4.35} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` add index `games_status_index`(`status`) {"params":[],"time":10.87} 
+[2019-11-06 13:55:30] production.DEBUG: update `games` set `status` = ? {"params":[1],"time":0.34} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_01_14_160000_alter_games_table_add_status",1],"time":2.07} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add `referrer_id` int unsigned null after `id` {"params":[],"time":5.54} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add constraint `users_referrer_id_foreign` foreign key (`referrer_id`) references `users` (`id`) on delete cascade on update cascade {"params":[],"time":101.52} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_02_18_101050_alter_users_table_add_referrer_id",1],"time":3.13} 
+[2019-11-06 13:55:30] production.DEBUG: create table `referral_bonuses` (`id` int unsigned not null auto_increment primary key, `user_id` int unsigned not null, `type` tinyint not null, `amount` decimal(20, 2) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":9.22} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `referral_bonuses` add constraint `referral_bonuses_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade {"params":[],"time":37.83} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_02_18_131502_create_referral_bonuses_table",1],"time":2.76} 
+[2019-11-06 13:55:30] production.DEBUG: create table `chat_messages` (`id` int unsigned not null auto_increment primary key, `user_id` int unsigned not null, `message` text not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":14.38} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `chat_messages` add constraint `chat_messages_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade {"params":[],"time":38.69} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_02_19_125624_create_chat_messages_table",1],"time":0.95} 
+[2019-11-06 13:55:30] production.DEBUG: create table `debits` (`id` int unsigned not null auto_increment primary key, `account_id` int unsigned not null, `amount` decimal(20, 2) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":10.95} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `debits` add constraint `debits_account_id_foreign` foreign key (`account_id`) references `accounts` (`id`) on delete cascade on update cascade {"params":[],"time":33.56} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_03_05_072317_create_debits_table",1],"time":1.84} 
+[2019-11-06 13:55:30] production.DEBUG: create table `credits` (`id` int unsigned not null auto_increment primary key, `account_id` int unsigned not null, `amount` decimal(20, 2) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":8.76} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `credits` add constraint `credits_account_id_foreign` foreign key (`account_id`) references `accounts` (`id`) on delete cascade on update cascade {"params":[],"time":35.24} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_03_05_072644_create_credits_table",1],"time":1.8} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `games` add `secret` varchar(300) not null after `status`, add `server_seed` varchar(32) not null after `secret`, add `client_seed` varchar(32) null after `server_seed` {"params":[],"time":4.48} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_03_11_101041_alter_games_table_add_secret_seed",1],"time":1.91} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `game_slots` add `bet_amount` decimal(10, 2) not null after `lines_bet` {"params":[],"time":5.24} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_03_13_142811_alter_game_slots_table_add_bet_amount",1],"time":1.04} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add `totp_secret` varchar(300) null after `remember_token` {"params":[],"time":5.92} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_06_13_095842_alter_users_table_add2_f_a_secret",1],"time":1.84} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add `referee_sign_up_credits` int unsigned null after `totp_secret`, add `referrer_sign_up_credits` int unsigned null after `referee_sign_up_credits`, add `referrer_game_bet_pct` decimal(8, 2) unsigned null after `referrer_sign_up_credits`, add `referrer_deposit_pct` decimal(8, 2) unsigned null after `referrer_game_bet_pct` {"params":[],"time":4.77} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_07_16_070139_alter_users_table_add_referrer_fields",1],"time":2.12} 
+[2019-11-06 13:55:30] production.DEBUG: update `account_transactions` set `transactionable_type` = ?, `updated_at` = ? where `transactionable_type` = ? {"params":["App\\Models\\Bonus","2019-11-06 13:55:30","App\\Models\\ReferralBonus"],"time":1.03} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `referral_bonuses` drop foreign key `referral_bonuses_user_id_foreign` {"params":[],"time":6.36} 
+[2019-11-06 13:55:30] production.DEBUG: rename table `referral_bonuses` to `bonuses` {"params":[],"time":10.02} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `bonuses` add `account_id` int unsigned not null after `id` {"params":[],"time":4.95} 
+[2019-11-06 13:55:30] production.DEBUG: select * from `bonuses` {"params":[],"time":0.4} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `bonuses` drop `user_id` {"params":[],"time":7.9} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `bonuses` add constraint `bonuses_account_id_foreign` foreign key (`account_id`) references `accounts` (`id`) on delete cascade on update cascade {"params":[],"time":39.13} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_09_18_150215_alter_referral_bonuses_table_add_account_id_foreign_key",1],"time":1.84} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` add `referrer_game_loss_pct` decimal(8, 2) unsigned null after `referrer_sign_up_credits`, add `referrer_game_win_pct` decimal(8, 2) unsigned null after `referrer_game_loss_pct` {"params":[],"time":4.74} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `users` drop `referrer_game_bet_pct` {"params":[],"time":4.7} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_09_19_085844_alter_users_table_modify_referrer_fields",1],"time":1.83} 
+[2019-11-06 13:55:30] production.DEBUG: create table `commands` (`id` int unsigned not null auto_increment primary key, `class` varchar(255) not null, `count` int unsigned not null default '1', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":11.51} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `commands` add unique `commands_class_unique`(`class`) {"params":[],"time":11.03} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_09_26_091033_create_commands_table",1],"time":1.88} 
+[2019-11-06 13:55:30] production.DEBUG: create table `social_profiles` (`id` int unsigned not null auto_increment primary key, `user_id` int unsigned not null, `provider_name` varchar(50) not null, `provider_user_id` varchar(255) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB {"params":[],"time":10.28} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `social_profiles` add constraint `social_profiles_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade on update cascade {"params":[],"time":38.59} 
+[2019-11-06 13:55:30] production.DEBUG: alter table `social_profiles` add unique `social_profiles_provider_name_provider_user_id_unique`(`provider_name`, `provider_user_id`) {"params":[],"time":12.15} 
+[2019-11-06 13:55:30] production.DEBUG: insert into `migrations` (`migration`, `batch`) values (?, ?) {"params":["2019_10_03_100000_create_social_profiles_table",1],"time":2.69} 
+[2019-11-06 13:56:48] production.ERROR: No application encryption key has been specified. {"exception":"[object] (RuntimeException(code: 0): No application encryption key has been specified. at E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php:44)
+[stacktrace]
+#0 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\helpers.php(1027): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}('')
+#1 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(48): tap('', Object(Closure))
+#2 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(24): Illuminate\\Encryption\\EncryptionServiceProvider->key(Array)
+#3 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(776): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#4 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build(Object(Closure))
+#5 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('encrypter', Array)
+#6 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('encrypter', Array)
+#7 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(912): Illuminate\\Foundation\\Application->make('encrypter')
+#8 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(840): Illuminate\\Container\\Container->resolveClass(Object(ReflectionParameter))
+#9 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(807): Illuminate\\Container\\Container->resolveDependencies(Array)
+#10 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build('App\\\\Http\\\\Middle...')
+#11 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('App\\\\Http\\\\Middle...', Array)
+#12 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('App\\\\Http\\\\Middle...', Array)
+#13 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(152): Illuminate\\Foundation\\Application->make('App\\\\Http\\\\Middle...')
+#14 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#15 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(104): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#16 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(684): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#17 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(659): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#18 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(625): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#19 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(614): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#20 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#21 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(30): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#22 E:\\WWW\\codecanyon\\vendor\\fideloper\\proxy\\src\\TrustProxies.php(57): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#23 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Fideloper\\Proxy\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(31): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#26 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(31): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#29 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#32 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(104): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#35 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(151): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#36 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(116): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#37 E:\\WWW\\codecanyon\\public\\index.php(55): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#38 E:\\WWW\\codecanyon\\server.php(21): require_once('E:\\\\WWW\\\\codecany...')
+#39 {main}
+"} 
+[2019-11-06 13:56:48] production.ERROR: No application encryption key has been specified. {"exception":"[object] (RuntimeException(code: 0): No application encryption key has been specified. at E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php:44)
+[stacktrace]
+#0 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\helpers.php(1027): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}('')
+#1 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(48): tap('', Object(Closure))
+#2 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(24): Illuminate\\Encryption\\EncryptionServiceProvider->key(Array)
+#3 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(776): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#4 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build(Object(Closure))
+#5 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('encrypter', Array)
+#6 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('encrypter', Array)
+#7 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(912): Illuminate\\Foundation\\Application->make('encrypter')
+#8 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(840): Illuminate\\Container\\Container->resolveClass(Object(ReflectionParameter))
+#9 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(807): Illuminate\\Container\\Container->resolveDependencies(Array)
+#10 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build('App\\\\Http\\\\Middle...')
+#11 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('App\\\\Http\\\\Middle...', Array)
+#12 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('App\\\\Http\\\\Middle...', Array)
+#13 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(215): Illuminate\\Foundation\\Application->make('App\\\\Http\\\\Middle...')
+#14 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(189): Illuminate\\Foundation\\Http\\Kernel->terminateMiddleware(Object(Illuminate\\Http\\Request), Object(Illuminate\\Http\\Response))
+#15 E:\\WWW\\codecanyon\\public\\index.php(60): Illuminate\\Foundation\\Http\\Kernel->terminate(Object(Illuminate\\Http\\Request), Object(Illuminate\\Http\\Response))
+#16 E:\\WWW\\codecanyon\\server.php(21): require_once('E:\\\\WWW\\\\codecany...')
+#17 {main}
+"} 
+[2019-11-06 13:57:22] production.ERROR: No application encryption key has been specified. {"exception":"[object] (RuntimeException(code: 0): No application encryption key has been specified. at E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php:44)
+[stacktrace]
+#0 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\helpers.php(1027): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}('')
+#1 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(48): tap('', Object(Closure))
+#2 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(24): Illuminate\\Encryption\\EncryptionServiceProvider->key(Array)
+#3 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(776): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#4 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build(Object(Closure))
+#5 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('encrypter', Array)
+#6 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('encrypter', Array)
+#7 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(912): Illuminate\\Foundation\\Application->make('encrypter')
+#8 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(840): Illuminate\\Container\\Container->resolveClass(Object(ReflectionParameter))
+#9 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(807): Illuminate\\Container\\Container->resolveDependencies(Array)
+#10 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build('App\\\\Http\\\\Middle...')
+#11 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('App\\\\Http\\\\Middle...', Array)
+#12 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('App\\\\Http\\\\Middle...', Array)
+#13 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(152): Illuminate\\Foundation\\Application->make('App\\\\Http\\\\Middle...')
+#14 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#15 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(104): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#16 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(684): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#17 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(659): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#18 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(625): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#19 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(614): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#20 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#21 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(30): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#22 E:\\WWW\\codecanyon\\vendor\\fideloper\\proxy\\src\\TrustProxies.php(57): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#23 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Fideloper\\Proxy\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(31): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#26 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(31): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#29 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#32 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(163): Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(53): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(104): Illuminate\\Routing\\Pipeline->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#35 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(151): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#36 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(116): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#37 E:\\WWW\\codecanyon\\public\\index.php(55): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#38 E:\\WWW\\codecanyon\\server.php(21): require_once('E:\\\\WWW\\\\codecany...')
+#39 {main}
+"} 
+[2019-11-06 13:57:22] production.ERROR: No application encryption key has been specified. {"exception":"[object] (RuntimeException(code: 0): No application encryption key has been specified. at E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php:44)
+[stacktrace]
+#0 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\helpers.php(1027): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}('')
+#1 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(48): tap('', Object(Closure))
+#2 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Encryption\\EncryptionServiceProvider.php(24): Illuminate\\Encryption\\EncryptionServiceProvider->key(Array)
+#3 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(776): Illuminate\\Encryption\\EncryptionServiceProvider->Illuminate\\Encryption\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#4 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build(Object(Closure))
+#5 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('encrypter', Array)
+#6 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('encrypter', Array)
+#7 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(912): Illuminate\\Foundation\\Application->make('encrypter')
+#8 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(840): Illuminate\\Container\\Container->resolveClass(Object(ReflectionParameter))
+#9 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(807): Illuminate\\Container\\Container->resolveDependencies(Array)
+#10 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(658): Illuminate\\Container\\Container->build('App\\\\Http\\\\Middle...')
+#11 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(609): Illuminate\\Container\\Container->resolve('App\\\\Http\\\\Middle...', Array)
+#12 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(759): Illuminate\\Container\\Container->make('App\\\\Http\\\\Middle...', Array)
+#13 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(215): Illuminate\\Foundation\\Application->make('App\\\\Http\\\\Middle...')
+#14 E:\\WWW\\codecanyon\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(189): Illuminate\\Foundation\\Http\\Kernel->terminateMiddleware(Object(Illuminate\\Http\\Request), Object(Illuminate\\Http\\Response))
+#15 E:\\WWW\\codecanyon\\public\\index.php(60): Illuminate\\Foundation\\Http\\Kernel->terminate(Object(Illuminate\\Http\\Request), Object(Illuminate\\Http\\Response))
+#16 E:\\WWW\\codecanyon\\server.php(21): require_once('E:\\\\WWW\\\\codecany...')
+#17 {main}
+"} 
+[2019-11-06 13:58:20] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":16.54} 
+[2019-11-06 13:58:20] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.39} 
+[2019-11-06 13:59:13] production.DEBUG: select count(*) as aggregate from `users` where `name` = ? {"params":["leopard"],"time":13.78} 
+[2019-11-06 13:59:13] production.DEBUG: select count(*) as aggregate from `users` where `email` = ? {"params":["partner3551@gmail.com"],"time":0.57} 
+[2019-11-06 13:59:24] production.DEBUG: select count(*) as aggregate from `users` where `name` = ? {"params":["leopard"],"time":14.09} 
+[2019-11-06 13:59:24] production.DEBUG: select count(*) as aggregate from `users` where `email` = ? {"params":["partner3551@gmail.com"],"time":0.51} 
+[2019-11-06 13:59:24] production.DEBUG: insert into `users` (`referrer_id`, `name`, `email`, `password`, `role`, `status`, `last_login_from`, `last_login_at`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) {"params":[null,"leopard","partner3551@gmail.com","$2y$10$UTW9IVp9n9./Esjt46GXneinTm1HtbQpBK8pyrM5voOBZorgTCnR2","USER",0,"127.0.0.1","2019-11-06 13:59:24","2019-11-06 13:59:24","2019-11-06 13:59:24"],"time":3.2} 
+[2019-11-06 13:59:24] production.DEBUG: insert into `accounts` (`user_id`, `code`, `updated_at`, `created_at`) values (?, ?, ?, ?) {"params":[1,"9f125c7d79cea418a4625133c2a4ea0f85651c8424307a8efc","2019-11-06 13:59:24","2019-11-06 13:59:24"],"time":2.54} 
+[2019-11-06 13:59:24] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.4} 
+[2019-11-06 13:59:24] production.DEBUG: insert into `bonuses` (`account_id`, `type`, `amount`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?) {"params":[1,20,1000,"2019-11-06 13:59:24","2019-11-06 13:59:24"],"time":1.96} 
+[2019-11-06 13:59:24] production.DEBUG: update `accounts` set `balance` = `balance` + 1000, `updated_at` = ? where `id` = ? {"params":["2019-11-06 13:59:24",1],"time":0.34} 
+[2019-11-06 13:59:24] production.DEBUG: insert into `account_transactions` (`account_id`, `amount`, `balance`, `transactionable_id`, `transactionable_type`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?) {"params":[1,1000,1000,1,"App\\Models\\Bonus","2019-11-06 13:59:24","2019-11-06 13:59:24"],"time":0.57} 
+[2019-11-06 13:59:24] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.6} 
+[2019-11-06 13:59:24] production.DEBUG: select count(*) as aggregate from `users` left join `accounts` on `accounts`.`user_id` = `users`.`id` left join `games` on `games`.`account_id` = `accounts`.`id` where `users`.`status` = ? and `games`.`status` = ? group by `users`.`id`, `name` {"params":[0,1],"time":0.86} 
+[2019-11-06 13:59:25] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.29} 
+[2019-11-06 13:59:25] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.36} 
+[2019-11-06 13:59:29] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.66} 
+[2019-11-06 13:59:29] production.DEBUG: select count(*) as aggregate from `users` left join `accounts` on `accounts`.`user_id` = `users`.`id` left join `games` on `games`.`account_id` = `accounts`.`id` where `users`.`status` = ? and `games`.`status` = ? group by `users`.`id`, `name` {"params":[0,1],"time":0.47} 
+[2019-11-06 13:59:29] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.01} 
+[2019-11-06 13:59:29] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.39} 
+[2019-11-06 13:59:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.6} 
+[2019-11-06 13:59:31] production.DEBUG: select count(*) as aggregate from `users` left join `accounts` on `accounts`.`user_id` = `users`.`id` left join `games` on `games`.`account_id` = `accounts`.`id` where `users`.`status` = ? and `games`.`status` = ? group by `users`.`id`, `name` {"params":[0,1],"time":0.52} 
+[2019-11-06 13:59:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.95} 
+[2019-11-06 13:59:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.42} 
+[2019-11-06 13:59:48] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.33} 
+[2019-11-06 13:59:48] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.42} 
+[2019-11-06 13:59:48] production.DEBUG: select * from `games` where (`gameable_type` = ? and `status` = ? and `account_id` = ?) order by `id` desc limit 1 {"params":["Packages\\GameSlots\\Models\\GameSlots",-1,1],"time":0.7} 
+[2019-11-06 13:59:48] production.DEBUG: insert into `game_slots` (`lines_bet`, `bet_amount`, `lines_win`, `scatters_count`, `reel_positions`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?) {"params":[0,0,0,0,"0,0,0,0,0","2019-11-06 13:59:48","2019-11-06 13:59:48"],"time":2.22} 
+[2019-11-06 13:59:48] production.DEBUG: insert into `games` (`account_id`, `bet`, `win`, `secret`, `server_seed`, `status`, `gameable_id`, `gameable_type`, `updated_at`, `created_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) {"params":[1,0,0,"1,5,3,0,3","eE3bF7ty1uegJqks",-1,1,"Packages\\GameSlots\\Models\\GameSlots","2019-11-06 13:59:48","2019-11-06 13:59:48"],"time":1.11} 
+[2019-11-06 13:59:48] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.77} 
+[2019-11-06 13:59:48] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.64} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.78} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.43} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `games` where (`gameable_type` = ? and `status` = ? and `account_id` = ?) order by `id` desc limit 1 {"params":["Packages\\GameSlots\\Models\\GameSlots",-1,1],"time":0.45} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `accounts` where `accounts`.`id` in (1) {"params":[],"time":0.32} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":11.77} 
+[2019-11-06 14:01:07] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.92} 
+[2019-11-06 14:01:13] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.59} 
+[2019-11-06 14:01:13] production.DEBUG: select count(*) as aggregate from `games` where `updated_at` > ? and `status` = ? {"params":["2019-11-03 14:01:13",1],"time":0.44} 
+[2019-11-06 14:01:13] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.02} 
+[2019-11-06 14:01:13] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.94} 
+[2019-11-06 14:01:16] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.85} 
+[2019-11-06 14:01:16] production.DEBUG: select * from `games` where `win` > ? and `status` = ? order by `win` desc limit 10 {"params":[0,1],"time":0.46} 
+[2019-11-06 14:01:16] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.03} 
+[2019-11-06 14:01:16] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.97} 
+[2019-11-06 14:01:19] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.53} 
+[2019-11-06 14:01:19] production.DEBUG: select * from `games` where `win` = ? and `status` = ? order by `bet` desc limit 10 {"params":[0,1],"time":0.65} 
+[2019-11-06 14:01:19] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.13} 
+[2019-11-06 14:01:19] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":11.75} 
+[2019-11-06 14:01:22] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.57} 
+[2019-11-06 14:01:22] production.DEBUG: select count(*) as aggregate from `users` left join `accounts` on `accounts`.`user_id` = `users`.`id` left join `games` on `games`.`account_id` = `accounts`.`id` where `users`.`status` = ? and `games`.`status` = ? group by `users`.`id`, `name` {"params":[0,1],"time":0.53} 
+[2019-11-06 14:01:22] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.85} 
+[2019-11-06 14:01:22] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.94} 
+[2019-11-06 14:01:25] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.24} 
+[2019-11-06 14:01:25] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":0.36} 
+[2019-11-06 14:01:25] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.38} 
+[2019-11-06 14:01:26] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.65} 
+[2019-11-06 14:01:26] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.76} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":["1"],"time":12.93} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":0.46} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.39} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `games` where `games`.`account_id` = ? and `games`.`account_id` is not null and `status` = ? {"params":[1,1],"time":0.35} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.98} 
+[2019-11-06 14:01:31] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.06} 
+[2019-11-06 14:01:34] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.9} 
+[2019-11-06 14:01:34] production.DEBUG: select * from `social_profiles` where `social_profiles`.`user_id` = ? and `social_profiles`.`user_id` is not null {"params":[1],"time":0.43} 
+[2019-11-06 14:01:34] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.39} 
+[2019-11-06 14:01:34] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.41} 
+[2019-11-06 14:01:38] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.01} 
+[2019-11-06 14:01:38] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.42} 
+[2019-11-06 14:01:38] production.DEBUG: select count(*) as aggregate from `games` where `account_id` = ? and `status` = ? {"params":[1,1],"time":0.36} 
+[2019-11-06 14:01:38] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.45} 
+[2019-11-06 14:01:38] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.77} 
+[2019-11-06 14:01:39] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.85} 
+[2019-11-06 14:01:39] production.DEBUG: select count(*) as aggregate from `users` left join `accounts` on `accounts`.`user_id` = `users`.`id` left join `games` on `games`.`account_id` = `accounts`.`id` where `users`.`status` = ? and `games`.`status` = ? group by `users`.`id`, `name` {"params":[0,1],"time":0.46} 
+[2019-11-06 14:01:40] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.02} 
+[2019-11-06 14:01:40] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.36} 
+[2019-11-06 14:01:40] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.63} 
+[2019-11-06 14:01:40] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":0.36} 
+[2019-11-06 14:01:40] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.3} 
+[2019-11-06 14:01:41] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.03} 
+[2019-11-06 14:01:41] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.65} 
+[2019-11-06 14:01:45] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.59} 
+[2019-11-06 14:01:45] production.DEBUG: select * from `accounts` where `accounts`.`user_id` = ? and `accounts`.`user_id` is not null limit 1 {"params":[1],"time":0.4} 
+[2019-11-06 14:01:45] production.DEBUG: select * from `games` where (`gameable_type` = ? and `status` = ? and `account_id` = ?) order by `id` desc limit 1 {"params":["Packages\\GameSlots\\Models\\GameSlots",-1,1],"time":0.42} 
+[2019-11-06 14:01:45] production.DEBUG: select * from `accounts` where `accounts`.`id` in (1) {"params":[],"time":0.4} 
+[2019-11-06 14:01:46] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.02} 
+[2019-11-06 14:01:46] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":2.47} 
+[2019-11-06 14:01:50] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.82} 
+[2019-11-06 14:01:50] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":0.48} 
+[2019-11-06 14:01:50] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.47} 
+[2019-11-06 14:01:51] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.92} 
+[2019-11-06 14:01:51] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.01} 
+[2019-11-06 14:01:56] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.59} 
+[2019-11-06 14:01:56] production.DEBUG: select count(*) as aggregate from `games` where `updated_at` > ? and `status` = ? {"params":["2019-11-03 14:01:56",1],"time":0.52} 
+[2019-11-06 14:01:56] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":14.86} 
+[2019-11-06 14:01:57] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.76} 
+[2019-11-06 14:02:38] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":12.48} 
+[2019-11-06 14:02:38] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":0.34} 
+[2019-11-06 14:02:38] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.34} 
+[2019-11-06 14:02:39] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":11.73} 
+[2019-11-06 14:02:39] production.DEBUG: select * from `users` where `id` = ? limit 1 {"params":[1],"time":13.59} 
+[2019-11-08 15:26:15] production.DEBUG: select * from `games` where `status` = ? order by `id` desc limit 5 {"params":[1],"time":20.63} 
+[2019-11-08 15:26:15] production.DEBUG: select * from `games` where `status` = ? order by `win` desc limit 1 {"params":[1],"time":0.44} 
